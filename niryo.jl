@@ -32,6 +32,12 @@ begin
 	Pkg.build("PyCall")
 end
 
+# ╔═╡ f95bab86-9e88-47b0-9254-ddb006af47cf
+using Graphs
+
+# ╔═╡ fe4c316d-6b7a-43ed-8df3-ffe48784db09
+using CoordinateTransformations
+
 # ╔═╡ 58427de3-46d9-4a6f-99f7-e71532390c7d
 begin
 function WidthOverDocs(enabled=false, offset = 30)
@@ -174,7 +180,7 @@ end;
 
 # ╔═╡ 909b1fba-d829-403f-b95d-2d2d51ca590a
 HTML("""
-<center><iframe src="http://100.88.39.58:5000" width="620" height="620" frameborder=0></iframe><iframe src="http://$(string(vis.core.host)):$(string(vis.core.port))" width="620" height="620" frameborder=0></iframe></center>
+<center><iframe src="http://100.88.39.58:5000" width="310" height="310" frameborder=0></iframe><iframe src="http://$(string(vis.core.host)):$(string(vis.core.port))" width="310" height="310" frameborder=0></iframe></center>
 """)
 
 # ╔═╡ ca6e62ed-c75a-45ca-85cc-06eec297989f
@@ -316,7 +322,7 @@ end
 
 # ╔═╡ ab1486ef-665b-49da-81c4-da63b069a509
 mvis = let
-	urdf = "niryo_one_description/urdf/v1/niryo_one.urdf"
+	urdf = "/home/tracerlab/Documents/niryo_one_description/urdf/v1/niryo_one.urdf"
 	robot = parse_urdf(urdf)
 	delete!(vis)	
 	mvis = MechanismVisualizer(robot, URDFVisuals(urdf), vis)
@@ -327,23 +333,37 @@ let
 	ned.move_joints(θ₁, θ₂, θ₃, θ₄, θ₅, θ₆)
 	copyto!(mvis.state.q, [θ₁, θ₂, θ₃, θ₄, θ₅, θ₆])
 	RigidBodyDynamics.setdirty!(mvis.state)
-	MeshCatMechanisms._render_state!(mvis)
+	state = mvis.state
+	@assert mvis.state.mechanism === state.mechanism
+	# if RigidBodyDynamics.modcount(state.mechanism) != mvis.modcount
+ #   		error("Mechanism has been modified after creating the visualizer. Please create a new MechanismVisualizer")
+	# end
 end
 
-# ╔═╡ b53bd9be-f0e9-4178-853e-b9f1d40d75b5
-	copyto!(mvis.state.q, [θ₁, θ₂, θ₃, θ₄, θ₅, θ₆])
-
-# ╔═╡ 963bd8b1-4bbe-4459-9653-255554147706
-	RigidBodyDynamics.setdirty!(mvis.state)
-
-
-# ╔═╡ 413c9a69-a9a4-41da-a8d6-2a1106f79d37
-	MeshCatMechanisms._render_state!(mvis) ######### THIS IS WHERE THE CODE GETS STUCK
+# ╔═╡ 84f82a5a-0028-4a00-9397-8561ae52d9b7
+let
+	[θ₁, θ₂, θ₃, θ₄, θ₅, θ₆]
+	state = mvis.state
+	tree = mvis.state.mechanism.tree # TODO: tree accessor?
+	RigidBodyDynamics.vertices(tree)
+	to_affine_map(tform::Transform3D) = AffineMap(rotation(tform), translation(tform))
+	for body in RigidBodyDynamics.vertices(tree)
+        if body == tree.root
+            continue
+        else
+            parent = RigidBodyDynamics.Graphs.source(RigidBodyDynamics.Graphs.edge_to_parent(body, tree), tree)
+            tform = relative_transform(state, default_frame(body), default_frame(parent))
+            settransform!(mvis[body], to_affine_map(tform))
+        end
+    end
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 MeshCat = "283c5d60-a78f-5afe-a0af-af636b173e11"
@@ -356,7 +376,9 @@ RigidBodyDynamics = "366cf18f-59d5-5db9-a4de-86a9f6786172"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [compat]
+CoordinateTransformations = "~0.6.2"
 FileIO = "~1.13.0"
+Graphs = "~1.6.0"
 HTTP = "~0.9.17"
 ImageMagick = "~1.2.2"
 MeshCat = "~0.14.2"
@@ -394,6 +416,12 @@ version = "3.3.3"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+
+[[deps.ArnoldiMethod]]
+deps = ["LinearAlgebra", "Random", "StaticArrays"]
+git-tree-sha1 = "62e51b39331de8911e4a7ff6f5aaf38a5f4cc0ae"
+uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
+version = "0.2.0"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -679,6 +707,12 @@ git-tree-sha1 = "344bf40dcab1073aca04aa0df4fb092f920e4011"
 uuid = "3b182d85-2403-5c21-9c21-1e1f0cc25472"
 version = "1.3.14+0"
 
+[[deps.Graphs]]
+deps = ["ArnoldiMethod", "Compat", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
+git-tree-sha1 = "57c021de207e234108a6f1454003120a1bf350c4"
+uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
+version = "1.6.0"
+
 [[deps.Grisu]]
 git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
 uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
@@ -736,6 +770,11 @@ deps = ["JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pkg", "Zlib_jll", "libpng_jll"
 git-tree-sha1 = "1c0a2295cca535fabaf2029062912591e9b61987"
 uuid = "c73af94c-d91f-53ed-93a7-00f77d67a9d7"
 version = "6.9.10-12+3"
+
+[[deps.Inflate]]
+git-tree-sha1 = "f5fc07d4e706b84f72d54eedcc1c13d92fb0871c"
+uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
+version = "0.1.2"
 
 [[deps.IniFile]]
 git-tree-sha1 = "f550e6e32074c939295eb5ea6de31849ac2c9625"
@@ -1238,6 +1277,12 @@ git-tree-sha1 = "91eddf657aca81df9ae6ceb20b959ae5653ad1de"
 uuid = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
 version = "1.0.3"
 
+[[deps.SimpleTraits]]
+deps = ["InteractiveUtils", "MacroTools"]
+git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
+uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
+version = "0.9.4"
+
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
@@ -1621,10 +1666,8 @@ version = "0.9.1+5"
 # ╟─73d93553-1bfb-4c2a-acd9-2c78f6637128
 # ╟─b6824140-754b-4f40-9b8a-18df4e5e60b0
 # ╟─909b1fba-d829-403f-b95d-2d2d51ca590a
-# ╠═376855eb-c110-4b91-a164-f219ab2fdd92
-# ╠═b53bd9be-f0e9-4178-853e-b9f1d40d75b5
-# ╠═963bd8b1-4bbe-4459-9653-255554147706
-# ╠═413c9a69-a9a4-41da-a8d6-2a1106f79d37
+# ╟─376855eb-c110-4b91-a164-f219ab2fdd92
+# ╟─84f82a5a-0028-4a00-9397-8561ae52d9b7
 # ╟─bc3559b9-892e-4661-85d2-2171a869e1dd
 # ╟─b7f6417a-a345-40e4-a461-21edf3d20714
 # ╟─a9267bca-e496-463f-a25f-7b62b8a6c836
@@ -1636,5 +1679,7 @@ version = "0.9.1+5"
 # ╟─e2e1edc1-f504-4e60-aa92-9bb6835fc138
 # ╟─ab1486ef-665b-49da-81c4-da63b069a509
 # ╟─ed4cca5e-91ae-11ec-0f83-839d5fbf6da4
+# ╠═f95bab86-9e88-47b0-9254-ddb006af47cf
+# ╠═fe4c316d-6b7a-43ed-8df3-ffe48784db09
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
