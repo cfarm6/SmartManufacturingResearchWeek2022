@@ -316,7 +316,7 @@ end
 
 # ╔═╡ ab1486ef-665b-49da-81c4-da63b069a509
 mvis = let
-	urdf = "/home/tracerlab/Documents/niryo_one_description/urdf/v1/niryo_one.urdf"
+	urdf = "niryo_one_description/urdf/v1/niryo_one.urdf"
 	robot = parse_urdf(urdf)
 	delete!(vis)	
 	mvis = MechanismVisualizer(robot, URDFVisuals(urdf), vis)
