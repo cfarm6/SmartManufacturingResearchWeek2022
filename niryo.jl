@@ -170,12 +170,12 @@ begin
 end
 
 # ╔═╡ 14bd44b5-8f76-4539-b9a9-086ad6a46d86
-MeshCat.CoreVisualizer(ip"100.90.177.2", 8710), ["meshcat"]
+# MeshCat.CoreVisualizer(ip"100.90.177.2", 8710), ["meshcat"]
 
 # ╔═╡ 5f2cae62-acbd-4a5d-9cf8-24155d9509be
 begin
-	vis = Visualizer(MeshCat.CoreVisualizer(ip"100.90.177.2", 8710), ["meshcat"]);
-	filename = "/home/tracerlab/Documents/niryo_one_description/urdf/v2/without_mesh_niryo_one.urdf";
+	vis = Visualizer();
+	filename = "niryo_one_description/urdf/v2/without_mesh_niryo_one.urdf";
 end;
 
 # ╔═╡ 909b1fba-d829-403f-b95d-2d2d51ca590a
