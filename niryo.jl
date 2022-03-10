@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.18.0
+# v0.18.1
 
 using Markdown
 using InteractiveUtils
@@ -124,6 +124,7 @@ HTML("""<center><video src = "https://raw.githubusercontent.com/cfarm6/BondGraph
 # ╔═╡ 73d93553-1bfb-4c2a-acd9-2c78f6637128
 md"""
 # Visualize and Control the Arm
+**Iteractivity Disabled for presentation**
 """
 
 # ╔═╡ b6824140-754b-4f40-9b8a-18df4e5e60b0
@@ -131,36 +132,24 @@ md"""
 
 θ₁ = $(@bind θ₁ Slider(range(-2.967, 2.967, length = 11), default = 0))
 θ₂ = $(@bind θ₂ Slider(range(-2.09, 0.610, length = 11), default = 0.0))
-θ₃ = $(@bind θ₃ Slider(range(-1.34, 1.57, length = 11), default = 0))
 
+θ₃ = $(@bind θ₃ Slider(range(-1.34, 1.57, length = 11), default = 0))
 θ₄ = $(@bind θ₄ Slider(range(-2.09, 2.09, length = 11), default = 0))
+
 θ₅ = $(@bind θ₅ Slider(range(-1.92, 1.05, length = 11), default = 0))
 θ₆ = $(@bind θ₆ Slider(range(-2.53, 2.53, length = 11), default = 0))
 
 """
 
+# ╔═╡ 909b1fba-d829-403f-b95d-2d2d51ca590a
+HTML("""
+<center><iframe src="http://100.88.39.58:5000" width="310" height="310" frameborder=0></iframe><iframe src="http://$(string(vis.core.host)):$(string(vis.core.port))" width="310" height="310" frameborder=0></iframe></center>
+""")
+
 # ╔═╡ bc3559b9-892e-4661-85d2-2171a869e1dd
 md"""
 # Pick and Place
 """
-
-# ╔═╡ b7f6417a-a345-40e4-a461-21edf3d20714
-# # for i ∈ 1:10
-# begin
-# 	ned.open_gripper(1000)
-# 	ned.move_joints(0.914,-0.771,0.115,0.523,-1.060,0.596)
-# 	ned.move_joints(0.889,-0.887,0.148,0.569,-1.00,0.550)
-# 	ned.close_gripper(1020)
-# 	ned.move_joints(0.909,-0.618,0.081,0.419,-1.092,0.739)
-# 	ned.move_joints(-0.575,0.0,-0.018,-0.066,-0.994,-0.391)
-# 	ned.move_joints(-0.575,-0.695,-0.018,-0.066,-0.994,-0.391)
-# 	ned.open_gripper(1000)
-# 	ned.move_joints(-0.574,-0.523,0.119,-0.057,-1.302,-0.386)
-# 	ned.move_joints(0.929,-1.241,0.968,0.0,-1.249,0.110)
-# 	ned.close_gripper(1020)
-# 	ned.move_joints(1.431,-0.290,-0.203,0.428,-0.965,1.297)
-# 	ned.open_gripper(75)
-# # end
 
 # ╔═╡ a9267bca-e496-463f-a25f-7b62b8a6c836
 begin
@@ -168,23 +157,6 @@ begin
 	ned = niryo.NiryoRobot("100.119.227.14")
 	ned.calibrate_auto()
 end
-
-# ╔═╡ 14bd44b5-8f76-4539-b9a9-086ad6a46d86
-# MeshCat.CoreVisualizer(ip"100.90.177.2", 8710), ["meshcat"]
-
-# ╔═╡ 5f2cae62-acbd-4a5d-9cf8-24155d9509be
-begin
-	vis = Visualizer();
-	filename = "niryo_one_description/urdf/v2/without_mesh_niryo_one.urdf";
-end;
-
-# ╔═╡ 909b1fba-d829-403f-b95d-2d2d51ca590a
-HTML("""
-<center><iframe src="http://100.88.39.58:5000" width="310" height="310" frameborder=0></iframe><iframe src="http://$(string(vis.core.host)):$(string(vis.core.port))" width="310" height="310" frameborder=0></iframe></center>
-""")
-
-# ╔═╡ ca6e62ed-c75a-45ca-85cc-06eec297989f
-vis.core.port
 
 # ╔═╡ c5aae4fc-946f-4c6c-b049-81786a5d57d5
 md"""
@@ -320,9 +292,13 @@ begin
 	end
 end
 
+# ╔═╡ 3b602c02-2d43-48d5-92b4-b893bf5558c9
+notebookpath = replace(@__FILE__, r"#==#.*" => "")
+
 # ╔═╡ ab1486ef-665b-49da-81c4-da63b069a509
 mvis = let
-	urdf = "/home/tracerlab/Documents/niryo_one_description/urdf/v1/niryo_one.urdf"
+	vis = Visualizer();
+	urdf = "/"*(joinpath(split(notebookpath, "/")[1:end-1]))*"/niryo_one_description/urdf/v1/niryo_one.urdf"
 	robot = parse_urdf(urdf)
 	delete!(vis)	
 	mvis = MechanismVisualizer(robot, URDFVisuals(urdf), vis)
@@ -357,6 +333,9 @@ let
         end
     end
 end
+
+# ╔═╡ ddba281e-c659-47e3-bf94-5bdc175d5b33
+split(notebookpath, "/")[1:end-1]|>joinpath
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -393,7 +372,7 @@ RigidBodyDynamics = "~2.3.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.2"
+julia_version = "1.7.0"
 manifest_format = "2.0"
 
 [[deps.AbstractFFTs]]
@@ -854,6 +833,12 @@ git-tree-sha1 = "f6250b16881adf048549549fba48b1161acdac8c"
 uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
 version = "3.100.1+0"
 
+[[deps.LERC_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "bf36f528eec6634efc60d7ec062008f171071434"
+uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
+version = "3.0.0+1"
+
 [[deps.LZO_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "e5b909bcf985c5e2605737d2ce278ed791b89be6"
@@ -933,10 +918,10 @@ uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
 version = "2.35.0+0"
 
 [[deps.Libtiff_jll]]
-deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
-git-tree-sha1 = "340e257aada13f95f98ee352d316c3bed37c8ab9"
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "Pkg", "Zlib_jll", "Zstd_jll"]
+git-tree-sha1 = "c9551dd26e31ab17b86cbd00c2ede019c08758eb"
 uuid = "89763e89-9b03-5906-acba-b20f662cd828"
-version = "4.3.0+0"
+version = "4.3.0+1"
 
 [[deps.Libuuid_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1663,21 +1648,19 @@ version = "0.9.1+5"
 # ╟─2d1d3066-3387-4c71-8502-af2023a65c09
 # ╟─5ef4b8d4-4d66-4779-90a0-dee2b97ddad3
 # ╟─3d836195-3408-40e7-a469-7828722d8d9b
-# ╟─73d93553-1bfb-4c2a-acd9-2c78f6637128
+# ╠═73d93553-1bfb-4c2a-acd9-2c78f6637128
 # ╟─b6824140-754b-4f40-9b8a-18df4e5e60b0
 # ╟─909b1fba-d829-403f-b95d-2d2d51ca590a
 # ╟─376855eb-c110-4b91-a164-f219ab2fdd92
 # ╟─84f82a5a-0028-4a00-9397-8561ae52d9b7
 # ╟─bc3559b9-892e-4661-85d2-2171a869e1dd
-# ╟─b7f6417a-a345-40e4-a461-21edf3d20714
 # ╟─a9267bca-e496-463f-a25f-7b62b8a6c836
-# ╟─ca6e62ed-c75a-45ca-85cc-06eec297989f
-# ╟─14bd44b5-8f76-4539-b9a9-086ad6a46d86
-# ╟─5f2cae62-acbd-4a5d-9cf8-24155d9509be
 # ╟─c5aae4fc-946f-4c6c-b049-81786a5d57d5
 # ╟─30e00650-3199-41c7-8953-70e5b88f5860
 # ╟─e2e1edc1-f504-4e60-aa92-9bb6835fc138
-# ╟─ab1486ef-665b-49da-81c4-da63b069a509
+# ╠═ab1486ef-665b-49da-81c4-da63b069a509
+# ╠═3b602c02-2d43-48d5-92b4-b893bf5558c9
+# ╠═ddba281e-c659-47e3-bf94-5bdc175d5b33
 # ╟─ed4cca5e-91ae-11ec-0f83-839d5fbf6da4
 # ╠═f95bab86-9e88-47b0-9254-ddb006af47cf
 # ╠═fe4c316d-6b7a-43ed-8df3-ffe48784db09

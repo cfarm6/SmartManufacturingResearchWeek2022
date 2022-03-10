@@ -29,7 +29,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/base_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/base_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.2 0.6 1 1"/>
@@ -38,7 +38,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/base_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/base_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -46,7 +46,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/shoulder_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/shoulder_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.8 0.8 0.8 1"/>
@@ -55,7 +55,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/shoulder_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/shoulder_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -63,7 +63,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/collada/arm_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/arm_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.2 0.6 1 1"/>
@@ -72,7 +72,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/collada/arm_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/arm_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -81,7 +81,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <!--	<box size="0.1 0.1 0.048"/> -->
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/elbow_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/elbow_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.8 0.8 0.8 1"/>
@@ -90,7 +90,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/elbow_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/elbow_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -98,7 +98,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/forearm_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/forearm_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.2 0.6 1 1"/>
@@ -107,7 +107,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/forearm_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/forearm_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -115,7 +115,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/wrist_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/wrist_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.8 0.8 0.8 1"/>
@@ -124,7 +124,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/wrist_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/wrist_link.stl"/>
       </geometry>
     </collision>
   </link>
@@ -132,7 +132,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/hand_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/hand_link.stl"/>
       </geometry>
       <material name="">
         <color rgba="0.6 0 0 1"/>
@@ -141,7 +141,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="/home/tracerlab/Documents/niryo_one_description/meshes/v1/stl/hand_link.stl"/>
+        <mesh filename=" /home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/niryo_one_description/meshes/v1/stl/hand_link.stl"/>
       </geometry>
     </collision>
   </link>
