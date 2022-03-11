@@ -1,0 +1,3 @@
+[submodule "BondGraphs.jl"]
+	path = BondGraphs.jl
+	url = git@github.com:TRACER-LULab/BondGraphs.jl.git
