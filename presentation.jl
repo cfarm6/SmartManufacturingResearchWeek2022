@@ -69,8 +69,8 @@ mvis = let
 	mvis = MechanismVisualizer(robot, URDFVisuals(joinpath(temp, "niryo_one.urdf")), vis)
 end;
 
-# ╔═╡ 56f2add9-3f18-403e-9a06-6b72c0991f2a
-HTML("""<center><iframe src="http://$(string(mvis.visualizer.core.host)):$(string(mvis.visualizer.core.port))" width=600, height = 400 frameborder=0></iframe></center>""")
+# ╔═╡ 86fb1b84-9ee5-400a-af26-5a52e9272105
+render(mvis.visualizer)
 
 # ╔═╡ 41f11a86-c14d-49ad-bc5a-c75d359461e0
 let
@@ -1070,7 +1070,7 @@ version = "3.5.0+0"
 # ╟─2b103c96-a156-11ec-26f4-43ce1eb5c83d
 # ╟─0fea4828-4fae-4847-8674-b803b4a57561
 # ╟─788a0d3f-7074-4975-8d8d-60a640ee7459
-# ╟─56f2add9-3f18-403e-9a06-6b72c0991f2a
+# ╟─86fb1b84-9ee5-400a-af26-5a52e9272105
 # ╟─4322e36c-3170-455e-ae56-dc7c8982f391
 # ╟─41f11a86-c14d-49ad-bc5a-c75d359461e0
 # ╟─dd6a5af2-61fb-4e3e-b395-0719c0435044
