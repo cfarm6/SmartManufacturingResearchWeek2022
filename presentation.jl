@@ -33,6 +33,7 @@ end
 md"""
 # Education for Smart Manufacturing: An Interactive Paradigm
 ## Carson Farmer 
+## Faculty Advisor: Dr. Hector Medina
 ### Liberty University Research Week 2022
 """
 
