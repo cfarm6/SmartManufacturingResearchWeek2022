@@ -4,3 +4,4 @@ port = 2345
 
 [Export]
 slider_server_url = "https://localhost:1235"
+offer_binder=false

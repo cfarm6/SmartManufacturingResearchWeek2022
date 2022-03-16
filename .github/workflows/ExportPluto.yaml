@@ -44,7 +44,6 @@ jobs:
                     Export_cache_dir="pluto_state_cache",
                     Export_baked_notebookfile=false,
                     Export_baked_state=false,
-                    offer_binder=false
                     # more parameters can go here
                   )'
 
