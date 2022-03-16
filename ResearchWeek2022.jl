@@ -55,6 +55,29 @@ md"""
 
 """
 
+# ╔═╡ 41f11a86-c14d-49ad-bc5a-c75d359461e0
+# let
+# 	[θ₁, θ₂, θ₃, θ₄, θ₅, θ₆]
+# 	copyto!(mvis.state.q, [θ₁, θ₂, θ₃, θ₄, θ₅, θ₆])
+# 	RigidBodyDynamics.setdirty!(mvis.state)
+# 	state = mvis.state
+# 	@assert mvis.state.mechanism === state.mechanism
+# 	state = mvis.state
+# 	tree = mvis.state.mechanism.tree # TODO: tree accessor?
+# 	RigidBodyDynamics.vertices(tree)
+# 	to_affine_map(tform::Transform3D) = AffineMap(rotation(tform), translation(tform))
+# 	for body in RigidBodyDynamics.vertices(tree)
+#         if body == tree.root
+#             continue
+#         else
+#             parent = RigidBodyDynamics.Graphs.source(RigidBodyDynamics.Graphs.edge_to_parent(body, tree), tree)
+#             tform = relative_transform(state, default_frame(body), default_frame(parent))
+#             settransform!(mvis[body], to_affine_map(tform))
+#         end
+#     end
+# 	render(mvis.visualizer)
+# end
+
 # ╔═╡ 4322e36c-3170-455e-ae56-dc7c8982f391
 mvis = let
 	location = "/"*joinpath(split(replace(@__FILE__, r"#==#.*"=>""), "/")[1:end-1])
@@ -70,28 +93,8 @@ mvis = let
 	mvis = MechanismVisualizer(robot, URDFVisuals(joinpath(temp, "niryo_one.urdf")), vis)
 end;
 
-# ╔═╡ 41f11a86-c14d-49ad-bc5a-c75d359461e0
-let
-	[θ₁, θ₂, θ₃, θ₄, θ₅, θ₆]
-	copyto!(mvis.state.q, [θ₁, θ₂, θ₃, θ₄, θ₅, θ₆])
-	RigidBodyDynamics.setdirty!(mvis.state)
-	state = mvis.state
-	@assert mvis.state.mechanism === state.mechanism
-	state = mvis.state
-	tree = mvis.state.mechanism.tree # TODO: tree accessor?
-	RigidBodyDynamics.vertices(tree)
-	to_affine_map(tform::Transform3D) = AffineMap(rotation(tform), translation(tform))
-	for body in RigidBodyDynamics.vertices(tree)
-        if body == tree.root
-            continue
-        else
-            parent = RigidBodyDynamics.Graphs.source(RigidBodyDynamics.Graphs.edge_to_parent(body, tree), tree)
-            tform = relative_transform(state, default_frame(body), default_frame(parent))
-            settransform!(mvis[body], to_affine_map(tform))
-        end
-    end
-	render(mvis.visualizer)
-end
+# ╔═╡ 5d96ceb2-fc9a-40c5-a592-3b133834cbea
+render_static(mvis.visualizer)
 
 # ╔═╡ dd6a5af2-61fb-4e3e-b395-0719c0435044
 md"""
@@ -1069,11 +1072,12 @@ version = "3.5.0+0"
 # ╟─2b103c96-a156-11ec-26f4-43ce1eb5c83d
 # ╟─0fea4828-4fae-4847-8674-b803b4a57561
 # ╟─788a0d3f-7074-4975-8d8d-60a640ee7459
-# ╠═41f11a86-c14d-49ad-bc5a-c75d359461e0
+# ╟─5d96ceb2-fc9a-40c5-a592-3b133834cbea
+# ╟─41f11a86-c14d-49ad-bc5a-c75d359461e0
 # ╟─4322e36c-3170-455e-ae56-dc7c8982f391
 # ╟─dd6a5af2-61fb-4e3e-b395-0719c0435044
 # ╟─f9b17be5-e270-47dc-a875-dd26e9d09b5b
 # ╟─7d2af361-5bfd-43ea-8582-cd62457398f3
-# ╟─a02ebcd8-2408-45bf-bb93-131ae33b6e93
+# ╠═a02ebcd8-2408-45bf-bb93-131ae33b6e93
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
