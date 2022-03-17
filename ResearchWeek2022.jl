@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.18.1
+# v0.18.2
 
 using Markdown
 using InteractiveUtils
@@ -29,12 +29,6 @@ begin
 	ENV["PYTHON"] = "/usr/bin/python3"
 	using PyCall
 	Pkg.build("PyCall")
-	import Pkg
-	dev = Pkg.develop
-	location = "/"*joinpath(split(replace(@__FILE__, r"#==#.*"=>""), "/")[1:end-1])
-	filename = joinpath(location, "BondGraphs.jl/")
-	dev(path=filename)
-	using BondGraphs
 end
 
 # ╔═╡ 0c1d7146-09f5-4a7a-9cc7-935b5680528b
@@ -143,47 +137,41 @@ md"""
 Resource("https://github.com/cfarm6/BondGraphPictures/raw/main/images/msd_airplace.png")
 
 # ╔═╡ d40ac3ed-6ff5-4bfc-b5bb-aae809d5e4cb
-msd_u0, msd_ps, msd_prob, msd_sys,  msd_bg, msd_tf_sym, msd_tf_func = let
+msd_u0, msd_ps, msd_prob, msd_sys, msd_tf_func = let
 	# Make Time Variable
 	@variables t, α, ω
-	# Make Bond Graph
-	msd = BondGraph(t)
-	# Add Bond Graph Elements
-	add_I!(msd, :m)
-	add_C!(msd, :k)
-	add_R!(msd, :b)
-	add_Se!(msd, :F)
-	# Add 1-Junction
-	add_1J!(msd, Dict(
-		:m => false,
-		:k => false,
-		:b => false,
-		:F => true
-		), :J1)
-	# Generate Model
-	sys = generate_model(msd)
+	@parameters Se(t)
+	@variables q(t) p(t) 
+	@variables s
+	@parameters m,k,b
+	D = Differential(t)
+	eqns = [
+		D(p) ~ (-q*k+Se-b*(p/m)),
+		D(q) ~ p/m
+	]
+	@named sys = ODESystem(eqns, t)
 	sys = structural_simplify(sys)
-	# Set Initial Equations	
+	tf = (1/k)*s/(1+b*(1/k)*s+s^2*(1/k)*m)
+	tf_func = build_function(tf, [s, m, k, b], expression = Val{false})
 	u0 = [
-		msd[:m].p => 0.0,
-		msd[:k].q => 0.0,
+		p => 0.0,
+		q => 0.0,
 	]|>Dict
 	ps = [
-		msd[:m].I => 1.0,
-		msd[:k].C => 1.0,
-		msd[:b].R => 1.0,
-		msd[:F].Se => 1.0
+		m => 1.0,
+		k => 1.0,
+		b => 1.0,
+		Se => 1.0
 	]|>Dict
 	tspan = (0.0,10.0)
 	prob = ODEProblem(sys, u0, tspan, ps)
-	# -------
-	A, B, C, D, x⃗, u⃗, y⃗ = state_space(msd, sys)
-	@variables s Fc(s) x(s)
-	C = C[y⃗[msd[:k].f], :]
-	D = D[y⃗[msd[:k].f], :]
-	tf = ((C'*inv(s*I(size(A,1)).-A)*B.+D).|>simplify_fractions)[1]
-	tf_func = build_function(tf, [s, msd[:m].I, msd[:k].C, msd[:b].R], expression = Val{false})
-	u0, ps, prob, sys, msd, (s*x/Fc ~ tf), tf_func
+	# # -------
+	# A, B, C, D, x⃗, u⃗, y⃗ = state_space(msd, sys)
+	# @variables s Fc(s) x(s)
+	# C = C[y⃗[msd[:k].f], :]
+	# D = D[y⃗[msd[:k].f], :]
+	# tf = ((C'*inv(s*I(size(A,1)).-A)*B.+D).|>simplify_fractions)[1]
+	u0, ps, prob, sys, tf_func
 end;
 
 # ╔═╡ 7d2af361-5bfd-43ea-8582-cd62457398f3
@@ -306,12 +294,17 @@ ThreeColumn(( @bind m_val Slider(1:10, default = 5)), (@bind k_val Slider(1:10, 
 
 # ╔═╡ 2cf645f9-95da-4759-906c-756d63e2e53d
 let
-	msd_ps[msd_bg[:m].I] = m_val
-	msd_ps[msd_bg[:k].C] = 1/k_val
-	msd_ps[msd_bg[:b].R] = b_val
+	@variables t, α, ω
+	@parameters Se(t)
+	@variables q(t) p(t) 
+	@variables s
+	@parameters m,k,b
+	msd_ps[m] = m_val
+	msd_ps[k] = k_val
+	msd_ps[b] = b_val
 	prob = remake(msd_prob, u0 = ModelingToolkit.varmap_to_vars(msd_u0, states(msd_sys)), p = ModelingToolkit.varmap_to_vars(msd_ps, ModelingToolkit.parameters(msd_sys)),)
 	sol = solve(prob, Tsit5())
-	disp_plt = plot(sol, vars = [msd_bg[:k].q], ylabel = "Displacement [m]", xlabel = "Time [s]", title = "Displacement")
+	disp_plt = plot(sol, vars = [q], ylabel = "Displacement [m]", xlabel = "Time [s]", title = "Displacement")
 	ωs =  10 .^(-3:0.01:3)
 	res = map(ω->msd_tf_func([2*π*ω*im, m_val, 1/k_val, b_val]), ωs)
 	AR = 20.0*log10.(abs.(res))
@@ -322,7 +315,6 @@ end
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-BondGraphs = "81b6dc42-80d7-44f0-b878-76c33e6b41d1"
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
@@ -339,7 +331,6 @@ RigidBodyDynamics = "366cf18f-59d5-5db9-a4de-86a9f6786172"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [compat]
-BondGraphs = "~0.1.5"
 CoordinateTransformations = "~0.6.2"
 DifferentialEquations = "~7.1.0"
 Graphs = "~1.6.0"
@@ -362,11 +353,6 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.7.0"
 manifest_format = "2.0"
-
-[[deps.ANSIColoredPrinters]]
-git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
-uuid = "a4c015fc-c6ff-483c-b24f-f7ea428134e9"
-version = "0.0.1"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
@@ -479,12 +465,6 @@ deps = ["Base64", "BinDeps", "Distributed", "JSExpr", "JSON", "Lazy", "Logging",
 git-tree-sha1 = "08d0b679fd7caa49e2bca9214b131289e19808c0"
 uuid = "ad839575-38b3-5650-b840-f874b8c74a25"
 version = "0.12.5"
-
-[[deps.BondGraphs]]
-deps = ["DifferentialEquations", "Documenter", "FileIO", "GraphIO", "Graphs", "LinearAlgebra", "MetaGraphs", "ModelingToolkit", "SymbolicUtils", "Symbolics"]
-path = "/home/carson/research/SmartManufacturing/SmartManufacturingResearchWeek2022/BondGraphs.jl/"
-uuid = "81b6dc42-80d7-44f0-b878-76c33e6b41d1"
-version = "0.1.5"
 
 [[deps.BoundaryValueDiffEq]]
 deps = ["BandedMatrices", "DiffEqBase", "FiniteDiff", "ForwardDiff", "LinearAlgebra", "NLsolve", "Reexport", "SparseArrays"]
@@ -768,12 +748,6 @@ git-tree-sha1 = "b19534d1895d702889b219c382a6e18010797f0b"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.8.6"
 
-[[deps.Documenter]]
-deps = ["ANSIColoredPrinters", "Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "cd0eb78e9b4202891ac61e74ca84402d01bafeba"
-uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.14"
-
 [[deps.DomainSets]]
 deps = ["CompositeTypes", "IntervalSets", "LinearAlgebra", "StaticArrays", "Statistics"]
 git-tree-sha1 = "5f5f0b750ac576bcf2ab1d7782959894b304923e"
@@ -853,12 +827,6 @@ version = "0.1.14"
 git-tree-sha1 = "acebe244d53ee1b461970f8910c235b259e772ef"
 uuid = "9aa1b823-49e4-5ca5-8b0f-3971ec8bab6a"
 version = "0.3.2"
-
-[[deps.FileIO]]
-deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "80ced645013a5dbdc52cf70329399c35ce007fae"
-uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.13.0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -961,12 +929,6 @@ deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libic
 git-tree-sha1 = "a32d672ac2c967f3deb8a81d828afc739c838a06"
 uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
 version = "2.68.3+2"
-
-[[deps.GraphIO]]
-deps = ["DelimitedFiles", "Graphs", "Requires", "SimpleTraits"]
-git-tree-sha1 = "c243b56234de8afbb6838129e72a4dfccd230ccc"
-uuid = "aa1b3936-2fda-51b9-ab35-c553d3a640a2"
-version = "0.6.0"
 
 [[deps.Graphite2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1124,12 +1086,6 @@ version = "0.9.2"
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
-
-[[deps.JLD2]]
-deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "Pkg", "Printf", "Reexport", "TranscodingStreams", "UUIDs"]
-git-tree-sha1 = "81b9477b49402b47fbe7f7ae0b252077f53e4a08"
-uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.4.22"
 
 [[deps.JLLWrappers]]
 deps = ["Preferences"]
@@ -1401,12 +1357,6 @@ deps = ["ColorTypes", "CoordinateTransformations", "GeometryBasics", "InteractBa
 git-tree-sha1 = "bfeadfb6a7229767ddf300575a7473d1fe89a80d"
 uuid = "6ad125db-dd91-5488-b820-c1df6aab299d"
 version = "0.8.2"
-
-[[deps.MetaGraphs]]
-deps = ["Graphs", "JLD2", "Random"]
-git-tree-sha1 = "2af69ff3c024d13bde52b34a2a7d6887d4e7b438"
-uuid = "626554b9-1ddb-594c-aa3c-2596fe9399a5"
-version = "0.7.1"
 
 [[deps.Metatheory]]
 deps = ["AutoHashEquals", "DataStructures", "Dates", "DocStringExtensions", "Parameters", "Reexport", "TermInterface", "ThreadsX", "TimerOutputs"]
@@ -2053,12 +2003,6 @@ version = "0.5.16"
 git-tree-sha1 = "0952c9cee34988092d73a5708780b3917166a0dd"
 uuid = "0796e94c-ce3b-5d07-9a54-7f471281c624"
 version = "0.5.21"
-
-[[deps.TranscodingStreams]]
-deps = ["Random", "Test"]
-git-tree-sha1 = "216b95ea110b5972db65aa90f88d8d89dcb8851c"
-uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.9.6"
 
 [[deps.Transducers]]
 deps = ["Adapt", "ArgCheck", "BangBang", "Baselet", "CompositionsBase", "DefineSingletons", "Distributed", "InitialValues", "Logging", "Markdown", "MicroCollections", "Requires", "Setfield", "SplittablesBase", "Tables"]
